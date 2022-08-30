@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta http-equiv="refresh" content="5"> -->
+
+    <title>Random Images</title>
+
+    <style>
+        * {
+            font-family: 'Courier New', Courier, monospace;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #image{
+            width: 100%;
+            height: 100%;
+
+        }
+
+        .msgBox {
+            /* margin: auto; */
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            max-width: 200px;
+            max-height: 200px;
+            background-color: black;
+            padding: 10px 5px;
+            border-radius: 10px;
+            opacity: 0.6;
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+            left: calc(50% - 50px);
+            top: calc(50% - 50px);
+            
+        }
+
+        .msgBox h3 {
+            color: white;
+            text-align: center;
+
+        }
+
+        .counDown {
+            position: absolute;
+            margin: 5px 10px;
+            left: 0;
+            top: 0;
+            color: white;
+            background-color: black;
+            opacity: 0.6;
+            padding: 2px 5px;
+            
+        }
+    </style>
+</head>
+<body>
+    <img src="" alt="" id="image">
+
+    <div class="msgBox">
+        <h3>1/3s</h3>
+    </div>
+
+    <h3 class="counDown"></h3>
+
+    <script type="text/javascript">
+        const url = "https://picsum.photos/1920/1080";
+
+        const timeLimits = {max: 60000, min: 3000}; // time limits for reloader
+        const msgBox = document.querySelector(".msgBox");
+        const msgLabel = document.querySelector(".msgBox h3");
+        const counDown = document.querySelector(".counDown");
+        const image = document.querySelector("#image");
+        let keys = {arrowUp: 38, arrowDown: 40, pausePlay: 32};
+        var seconds = 5000;
+
+
+        var reloader_id = setInterval(reloader, seconds);
+
+        var sec = seconds / 1000;
+        let c_interval = 990;
+        var coun_down_shower_id = setInterval(cTimeShower, c_interval);
+
+
+        const increaseRefreshRate = () => {
+            if (seconds < timeLimits.max) {
+                seconds += 1000;
+                displayMsg(`1/${seconds / 1000}s`)
+                // clear the older one and set new interval
+                clearInterval(reloader_id);
+                reloader_id = setInterval(reloader, seconds);
+            }
+        };
+
+        const decreaseRefreshRate = () => {
+            if (seconds > timeLimits.min) {
+                seconds -= 1000;
+                displayMsg(`1/${seconds / 1000}s`);
+                // clear the older one and set new interval
+                clearInterval(reloader_id);
+                reloader_id = setInterval(reloader, seconds);
+            }
+        };
+        const pauseAndPlay = () => {
+            if (reloader_id === null) {
+                reloader_id = setInterval(reloader, seconds);
+                coun_down_shower_id = setInterval(cTimeShower, c_interval);
+                displayMsg("Play");
+            } else {
+                clearInterval(reloader_id);
+                reloader_id = null;
+                clearInterval(coun_down_shower_id);
+                displayMsg("Paused", true);
+            }
+        };
+
+        window.addEventListener("keyup", event => {
+            console.log(event.keyCode, event.key)
+            console.clear()
+            switch (event.keyCode) {
+
+                case keys.arrowUp: {
+                    console.log("Incresing Refresh Rate Seconds")
+                    increaseRefreshRate();
+                    break;
+                }
+                
+                case keys.arrowDown: {
+                    console.log("Descresing Refresh Rate Seconds")
+                    decreaseRefreshRate();
+                    break;
+                }
+
+                case keys.pausePlay: {
+                    console.log("Pause and Play")
+                    pauseAndPlay();
+                    break;
+                }
+            }
+
+            
+        });
+
+
+
+//      showing the message
+        var hider_id = null;
+        function displayMsg(msg, pause = false) {
+            if (hider_id !== null) 
+                clearTimeout(hider_id);
+            
+            msgBox.style.display = "flex";
+            msgLabel.innerHTML = msg;
+            
+            if (!pause)
+                hider_id = setTimeout(hider, 2000);
+        }
+
+        function hider() {
+            msgBox.style.display = "none";
+        }
+//      showing the CounDown
+        function cTimeShower() {
+            counDown.innerHTML = `${sec}s`;
+            sec -= 1;
+        }
+
+        function reloader() {
+            let xmlHttpReq = new XMLHttpRequest();
+            xmlHttpReq.open("get", url, false);
+            xmlHttpReq.send(null);
+            // var res = xmlHttpReq.response;
+            image.src = xmlHttpReq.responseURL;
+            sec = seconds / 1000;
+            
+        }
+    </script>
+</body>
+</html>
