@@ -66,16 +66,18 @@
             padding: 2px 5px;
             
         }
+
     </style>
 </head>
 <body>
-    <img src="" alt="" id="image">
+    <img id="image">
 
     <div class="msgBox">
         <h3>1/3s</h3>
     </div>
 
-    <h3 class="counDown"></h3>
+    <h3 class="counDown">00s</h3>
+
 
     <script type="text/javascript">
         const url = "https://picsum.photos/1920/1080";
@@ -85,10 +87,11 @@
         const msgLabel = document.querySelector(".msgBox h3");
         const counDown = document.querySelector(".counDown");
         const image = document.querySelector("#image");
+
         let keys = {arrowUp: 38, arrowDown: 40, pausePlay: 32};
         var seconds = 5000;
 
-
+        window.onload = () => reloader();
         var reloader_id = setInterval(reloader, seconds);
 
         var sec = seconds / 1000;
@@ -129,24 +132,24 @@
         };
 
         window.addEventListener("keyup", event => {
-            console.log(event.keyCode, event.key)
-            console.clear()
+            // console.log(event.keyCode, event.key)
+            // console.clear()
             switch (event.keyCode) {
 
                 case keys.arrowUp: {
-                    console.log("Incresing Refresh Rate Seconds")
+                    // console.log("Incresing Refresh Rate Seconds")
                     increaseRefreshRate();
                     break;
                 }
                 
                 case keys.arrowDown: {
-                    console.log("Descresing Refresh Rate Seconds")
+                    // console.log("Descresing Refresh Rate Seconds")
                     decreaseRefreshRate();
                     break;
                 }
 
                 case keys.pausePlay: {
-                    console.log("Pause and Play")
+                    // console.log("Pause and Play")
                     pauseAndPlay();
                     break;
                 }
@@ -154,7 +157,6 @@
 
             
         });
-
 
 
 //      showing the message
@@ -175,19 +177,30 @@
         }
 //      showing the CounDown
         function cTimeShower() {
-            counDown.innerHTML = `${sec}s`;
+            counDown.innerHTML = (sec <= 9 && sec >= 0) ? `0${sec}s`: `${sec}s`;
             sec -= 1;
         }
 
+        
         function reloader() {
             let xmlHttpReq = new XMLHttpRequest();
             xmlHttpReq.open("get", url, false);
-            xmlHttpReq.send(null);
-            // var res = xmlHttpReq.response;
-            image.src = xmlHttpReq.responseURL;
-            sec = seconds / 1000;
+            xmlHttpReq.send(xmlHttpReq);
+            console.log(xmlHttpReq.status)
             
+            switch (xmlHttpReq.status) {
+                case 200: {
+                    image.src = xmlHttpReq.responseURL;
+                    break;
+                } default: {
+                    console.error("something went wrong, status code : ", xmlHttpReq.status);
+                }
+            }
+            
+            sec = seconds / 1000;
         }
+
+
     </script>
 </body>
 </html>
